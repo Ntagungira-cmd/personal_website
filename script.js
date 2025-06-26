@@ -160,31 +160,150 @@
   
       // Form validation and submission
       const contactForm = document.getElementById('contactForm');
-  
-      contactForm.addEventListener('submit', (e) =>
-      {
-        e.preventDefault();
-  
-        const formData = new FormData(contactForm);
-        const name = formData.get('name');
-        const email = formData.get('email');
-        const message = formData.get('message');
-  
-        // Basic validation
-        if (!name || !email || !message)
-        {
-          alert('Please fill in all fields');
-          return;
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const messageInput = document.getElementById('message');
+      const nameError = document.getElementById('nameError');
+      const emailError = document.getElementById('emailError');
+      const messageError = document.getElementById('messageError');
+      
+      // Validation functions
+      function validateName(name) {
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!name) {
+          return 'Name is required';
         }
-  
-        // Email validation
+        if (!nameRegex.test(name)) {
+          return 'Name must contain only letters and spaces';
+        }
+        if (name.length > 50) {
+          return 'Name must not exceed 50 characters';
+        }
+        return '';
+      }
+      
+      function validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email))
-        {
-          alert('Please enter a valid email address');
+        if (!email) {
+          return 'Email is required';
+        }
+        if (!emailRegex.test(email)) {
+          return 'Please enter a valid email address';
+        }
+        if (email.length > 50) {
+          return 'Email must not exceed 50 characters';
+        }
+        return '';
+      }
+      
+      function validateMessage(message) {
+        if (!message) {
+          return 'Message is required';
+        }
+        if (message.length > 200) {
+          return 'Message must not exceed 200 characters';
+        }
+        return '';
+      }
+      
+      function showError(input, errorElement, message) {
+        input.classList.add('error');
+        errorElement.textContent = message;
+      }
+      
+      function clearError(input, errorElement) {
+        input.classList.remove('error');
+        errorElement.textContent = '';
+      }
+      
+      // Real-time validation
+      nameInput.addEventListener('blur', () => {
+        const error = validateName(nameInput.value.trim());
+        if (error) {
+          showError(nameInput, nameError, error);
+        } else {
+          clearError(nameInput, nameError);
+        }
+      });
+      
+      emailInput.addEventListener('blur', () => {
+        const error = validateEmail(emailInput.value.trim());
+        if (error) {
+          showError(emailInput, emailError, error);
+        } else {
+          clearError(emailInput, emailError);
+        }
+      });
+      
+      messageInput.addEventListener('blur', () => {
+        const error = validateMessage(messageInput.value.trim());
+        if (error) {
+          showError(messageInput, messageError, error);
+        } else {
+          clearError(messageInput, messageError);
+        }
+      });
+      
+      // Clear errors on input
+      nameInput.addEventListener('input', () => {
+        if (nameInput.classList.contains('error')) {
+          clearError(nameInput, nameError);
+        }
+      });
+      
+      emailInput.addEventListener('input', () => {
+        if (emailInput.classList.contains('error')) {
+          clearError(emailInput, emailError);
+        }
+      });
+      
+      messageInput.addEventListener('input', () => {
+        if (messageInput.classList.contains('error')) {
+          clearError(messageInput, messageError);
+        }
+      });
+      
+      // Form submission
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+      
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const message = messageInput.value.trim();
+      
+        // Validate all fields
+        const nameErrorMsg = validateName(name);
+        const emailErrorMsg = validateEmail(email);
+        const messageErrorMsg = validateMessage(message);
+      
+        let hasErrors = false;
+      
+        if (nameErrorMsg) {
+          showError(nameInput, nameError, nameErrorMsg);
+          hasErrors = true;
+        } else {
+          clearError(nameInput, nameError);
+        }
+      
+        if (emailErrorMsg) {
+          showError(emailInput, emailError, emailErrorMsg);
+          hasErrors = true;
+        } else {
+          clearError(emailInput, emailError);
+        }
+      
+        if (messageErrorMsg) {
+          showError(messageInput, messageError, messageErrorMsg);
+          hasErrors = true;
+        } else {
+          clearError(messageInput, messageError);
+        }
+      
+        // If there are errors, don't submit
+        if (hasErrors) {
           return;
         }
-  
+      
         // Simulate form submission
         alert('Thank you for your message! I will get back to you soon.');
         contactForm.reset();
